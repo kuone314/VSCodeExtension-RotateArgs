@@ -1,11 +1,138 @@
 import * as vscode from 'vscode';
 
-export function activate(context: vscode.ExtensionContext) {
-	
-	console.log('Congratulations, your extension "rotate-args" is now active!');
 
-	let disposable = vscode.commands.registerCommand('rotate-args.helloWorld', () => {
-		vscode.window.showInformationMessage('Hello World from Rotate Args!');
+///////////////////////////////////////////////////////////////////////////////////////////////////
+function offset(document: vscode.TextDocument, pos: vscode.Position, val: number): vscode.Position {
+	const offset = document.offsetAt(pos);
+	const nextOffset = offset + val;
+	return document.positionAt(nextOffset);
+}
+
+async function move(editor: vscode.TextEditor, pos: vscode.Position): Promise<vscode.Position>{
+	const nxtPos = offset(editor.document, pos, 1);
+
+	const line = editor.document.lineAt(pos);
+	if (nxtPos.isEqual(pos) && nxtPos.isEqual(line.range.end)) {
+		// 改行コードが LF の場合に、問題になるっぽい？
+		return line.rangeIncludingLineBreak.end;
+	}
+
+	const char = editor.document.getText(new vscode.Range(pos, nxtPos));
+	const isBracket = (
+		char[0] === '{' ||
+		char[0] === '(' ||
+		char[0] === '['
+	);
+	if (!isBracket) { return nxtPos; }
+
+
+	editor.selection = new vscode.Selection(pos, pos);
+
+	await vscode.commands.executeCommand('editor.action.jumpToBracket');
+	const bracketPairPos = editor.selection.start;
+	if (pos.isEqual(bracketPairPos)) {
+		return nxtPos;
+	}
+
+	await vscode.commands.executeCommand('editor.action.jumpToBracket');
+	const revbrancketpos = editor.selection.start;
+	if (!revbrancketpos.isEqual(pos)) {
+		return nxtPos;
+	}
+
+	return bracketPairPos;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+interface Divided {
+	argAry: string[],
+	separatorAry: string[],
+}
+async function divide(editor: vscode.TextEditor, range: vscode.Range, separator: RegExp): Promise<Divided> {
+	let result: Divided = { argAry: [], separatorAry: [] };
+
+	editor.selection = new vscode.Selection(range.start, range.start);
+	let lastDividedPos = range.start;
+	let cursol = range.start;
+	while(true){
+		cursol = await move(editor, cursol);
+		if (cursol.isAfterOrEqual(range.end)) {
+			break;
+		}
+
+		const remain = editor.document.getText(new vscode.Range(cursol, range.end));
+		const matched = remain.match(separator);
+		if (!matched) { continue; }
+		if (matched.index !== 0) { continue; }
+
+		const curSeparator = matched[0];
+		result.argAry.push(editor.document.getText(new vscode.Range(lastDividedPos, cursol)));
+		result.separatorAry.push(curSeparator);
+
+		cursol = offset(editor.document, cursol, curSeparator.length);
+		lastDividedPos = cursol;
+	}
+
+
+	const remain = editor.document.getText(new vscode.Range(lastDividedPos, range.end));
+	if(remain.length!==0){
+		result.argAry.push(remain);
+	}
+	return result;
+}
+
+function rotate(divided: Divided): string {
+	var result = "";
+	for (let idx = 0; idx < divided.argAry.length; idx++) {
+		const rotIdx = (idx +divided.argAry.length - 1) % divided.argAry.length;
+		result += divided.argAry[rotIdx];
+
+		if (idx < divided.separatorAry.length) {
+			result += divided.separatorAry[idx];
+		}
+	}
+	return result;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+export async function replaceInfo(editor: vscode.TextEditor,separator:RegExp): Promise<Array<[vscode.Range, string]>> {
+	var result = new Array<[vscode.Range, string]>();
+
+	const orgSelections = editor.selections;
+	for(const selection of orgSelections) {
+		const divided = await divide(editor, selection, separator);
+		const newStr = rotate(divided);
+		result.push([selection, newStr]);
+	}
+	editor.selections = orgSelections;
+
+	return result;
+}
+
+export function replace(editBuilder: vscode.TextEditorEdit, replaceInfo: Array<[vscode.Range, string]>) {
+	for (const info of replaceInfo) {
+		editBuilder.replace(info[0], info[1]);
+	}
+}
+
+async function exec(editor: vscode.TextEditor) {
+	const separator = new RegExp("\\s*,\\s*");
+
+	const info = await replaceInfo(editor, separator);
+
+	editor.edit(editBuilder => {
+		replace(editBuilder, info);
+	});
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+export function activate(context: vscode.ExtensionContext) {
+
+	let disposable = vscode.commands.registerCommand('rotate-args.helloWorld', async () => {
+		const editor = vscode.window.activeTextEditor;
+		if (!editor) { return; }
+
+		exec(editor);
 	});
 
 	context.subscriptions.push(disposable);
