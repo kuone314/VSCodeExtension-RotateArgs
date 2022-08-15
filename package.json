@@ -10,14 +10,14 @@
 		"Other"
 	],
 	"activationEvents": [
-        "onCommand:rotate-args.helloWorld"
+        "onCommand:rotate-args.byComma"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "rotate-args.helloWorld",
-				"title": "Hello World"
+				"command": "rotate-args.byComma",
+				"title": "Rotate args by comma."
 			}
 		]
 	},

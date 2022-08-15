@@ -128,7 +128,7 @@ async function exec(editor: vscode.TextEditor) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 export function activate(context: vscode.ExtensionContext) {
 
-	let disposable = vscode.commands.registerCommand('rotate-args.helloWorld', async () => {
+	let disposable = vscode.commands.registerCommand('rotate-args.byComma', async () => {
 		const editor = vscode.window.activeTextEditor;
 		if (!editor) { return; }
 
