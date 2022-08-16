@@ -7,7 +7,8 @@ export function activate(context: vscode.ExtensionContext) {
 		const editor = vscode.window.activeTextEditor;
 		if (!editor) { return; }
 
-		exec(editor);
+		const separator = new RegExp("\\s*,\\s*");
+		exec(editor, separator);
 	});
 
 	context.subscriptions.push(disposable);
@@ -130,9 +131,7 @@ export function replace(editBuilder: vscode.TextEditorEdit, replaceInfo: Array<[
 	}
 }
 
-async function exec(editor: vscode.TextEditor) {
-	const separator = new RegExp("\\s*,\\s*");
-
+async function exec(editor: vscode.TextEditor,separator:RegExp) {
 	const info = await replaceInfo(editor, separator);
 
 	editor.edit(editBuilder => {
