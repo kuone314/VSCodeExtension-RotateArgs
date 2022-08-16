@@ -36,6 +36,9 @@ suite('Extension Test Suite', () => {
 			new vscode.Selection(new vscode.Position(2, 4), new vscode.Position(2, 24)),
 			new vscode.Selection(new vscode.Position(3, 5), new vscode.Position(3, 33)),
 			new vscode.Selection(new vscode.Position(5, 2), new vscode.Position(7, 8)),
+			new vscode.Selection(new vscode.Position(9, 7), new vscode.Position(9, 15)),
+			new vscode.Selection(new vscode.Position(10, 3), new vscode.Position(10, 35)),
+			new vscode.Selection(new vscode.Position(11, 3), new vscode.Position(15, 3)),
 		];
 		const info = await replaceInfo(editor, new RegExp("\\s*,\\s*"));
 		await editor.edit(editBuilder => {
