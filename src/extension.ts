@@ -12,6 +12,27 @@ export function activate(context: vscode.ExtensionContext) {
 			exec(editor, separator);
 		})
 	);
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('rotate-args.byEqual', async () => {
+			const editor = vscode.window.activeTextEditor;
+			if (!editor) { return; }
+
+			const separator = new RegExp("\\s*=\\s*");
+			exec(editor, separator);
+		})
+	);
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('rotate-args.bySpace', async () => {
+			const editor = vscode.window.activeTextEditor;
+			if (!editor) { return; }
+
+			const separator = new RegExp("\\s+");
+			exec(editor, separator);
+		})
+	);
+
 }
 
 export function deactivate() {}

@@ -12,7 +12,9 @@
 		"Other"
 	],
 	"activationEvents": [
-        "onCommand:rotate-args.byComma"
+        "onCommand:rotate-args.byComma",
+        "onCommand:rotate-args.byEqual",
+        "onCommand:rotate-args.bySpace"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -20,6 +22,14 @@
 			{
 				"command": "rotate-args.byComma",
 				"title": "Rotate args by comma."
+			},
+			{
+				"command": "rotate-args.byEqual",
+				"title": "Rotate args by =."
+			},
+			{
+				"command": "rotate-args.bySpace",
+				"title": "Rotate args by space."
 			}
 		]
 	},
