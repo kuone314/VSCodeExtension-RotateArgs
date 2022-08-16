@@ -1,5 +1,19 @@
 import * as vscode from 'vscode';
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+export function activate(context: vscode.ExtensionContext) {
+
+	let disposable = vscode.commands.registerCommand('rotate-args.byComma', async () => {
+		const editor = vscode.window.activeTextEditor;
+		if (!editor) { return; }
+
+		exec(editor);
+	});
+
+	context.subscriptions.push(disposable);
+}
+
+export function deactivate() {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 function offset(document: vscode.TextDocument, pos: vscode.Position, val: number): vscode.Position {
@@ -125,21 +139,6 @@ async function exec(editor: vscode.TextEditor) {
 		replace(editBuilder, info);
 	});
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-export function activate(context: vscode.ExtensionContext) {
-
-	let disposable = vscode.commands.registerCommand('rotate-args.byComma', async () => {
-		const editor = vscode.window.activeTextEditor;
-		if (!editor) { return; }
-
-		exec(editor);
-	});
-
-	context.subscriptions.push(disposable);
-}
-
-export function deactivate() {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 async function isBracketSelect(editor: vscode.TextEditor, selection: vscode.Selection): Promise<Boolean>{
