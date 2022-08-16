@@ -99,7 +99,8 @@ export async function replaceInfo(editor: vscode.TextEditor,separator:RegExp): P
 	var result = new Array<[vscode.Range, string]>();
 
 	const orgSelections = editor.selections;
-	for(const selection of orgSelections) {
+	for(const orgSelection of orgSelections) {
+		const selection = await normalizeSelection(editor, orgSelection);
 		const divided = await divide(editor, selection, separator);
 		const newStr = rotate(divided);
 		result.push([selection, newStr]);
@@ -139,3 +140,43 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+async function isBracketSelect(editor: vscode.TextEditor, selection: vscode.Selection): Promise<Boolean>{
+	editor.selection = new vscode.Selection(selection.start, selection.start);
+	await vscode.commands.executeCommand('editor.action.jumpToBracket');
+	return editor.selection.start.translate(0, 1).isEqual(selection.end);
+}
+
+function matchLength(str:string,regexp:RegExp):number{
+	const matched = str.match(regexp);
+	if (!matched) { return 0; }
+	return matched[0].length;
+}
+
+function trimSpacesFromSelection(document: vscode.TextDocument, selection: vscode.Selection): vscode.Selection{
+
+	const str = document.getText(selection);
+
+	const frontBlank = new RegExp("^\\s+");
+	const frontBlankLength = matchLength(str, frontBlank);
+
+	const trailBlank = new RegExp("\\s+$");
+	const trailBlankLength = matchLength(str, trailBlank);
+
+	return new vscode.Selection(
+		offset(document, selection.start, +frontBlankLength),
+		offset(document, selection.end, -trailBlankLength),
+	);
+}
+
+async function normalizeSelection(editor: vscode.TextEditor, org: vscode.Selection): Promise<vscode.Selection>{
+	var result = org;
+
+	if (await isBracketSelect(editor, org)) {
+		result = new vscode.Selection(org.start.translate(0, 1), org.end.translate(0, -1));
+	}
+
+	return trimSpacesFromSelection(editor.document, result);
+}
+
