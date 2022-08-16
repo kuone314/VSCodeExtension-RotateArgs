@@ -4,7 +4,11 @@
 
 # Rotate Args
 
-<!-- ![Sample](Doc/Demonstration.gif) -->
+
+![Sample](Doc/Demonstration.gif)
+* Rotate strings with a comma delimiter for the selection.  
+  選択範囲に対しカンマ区切りで文字列をローテーションする。
+
 
 # Link
 
