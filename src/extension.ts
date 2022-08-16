@@ -3,15 +3,15 @@ import * as vscode from 'vscode';
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 export function activate(context: vscode.ExtensionContext) {
 
-	let disposable = vscode.commands.registerCommand('rotate-args.byComma', async () => {
-		const editor = vscode.window.activeTextEditor;
-		if (!editor) { return; }
+	context.subscriptions.push(
+		vscode.commands.registerCommand('rotate-args.byComma', async () => {
+			const editor = vscode.window.activeTextEditor;
+			if (!editor) { return; }
 
-		const separator = new RegExp("\\s*,\\s*");
-		exec(editor, separator);
-	});
-
-	context.subscriptions.push(disposable);
+			const separator = new RegExp("\\s*,\\s*");
+			exec(editor, separator);
+		})
+	);
 }
 
 export function deactivate() {}
