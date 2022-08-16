@@ -3,6 +3,8 @@
 	"displayName": "Rotate Args",
 	"description": "",
 	"version": "0.0.1",
+	"repository": "https://github.com/kuone314/VSCodeExtension-RotateArgs",
+	"publisher": "kuone",
 	"engines": {
 		"vscode": "^1.70.0"
 	},
