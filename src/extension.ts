@@ -4,6 +4,21 @@ import * as vscode from 'vscode';
 export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(
+		vscode.commands.registerCommand('rotate-args.byRegExp', async () => {
+			const editor = vscode.window.activeTextEditor;
+			if (!editor) { return; }
+
+			const opt: vscode.InputBoxOptions = {
+				prompt:"input separator regexp",
+			};
+			const separator = await vscode.window.showInputBox(opt);
+			if (!separator) { return; }
+
+			exec(editor, new RegExp(separator));
+		})
+	);
+
+	context.subscriptions.push(
 		vscode.commands.registerCommand('rotate-args.byComma', async () => {
 			const editor = vscode.window.activeTextEditor;
 			if (!editor) { return; }
