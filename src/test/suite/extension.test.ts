@@ -27,7 +27,7 @@ async function checkText(
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 suite('Extension Test Suite', () => {
-	test('test', async () => {
+	test('rotate by commma', async () => {
 		const document = await vscode.workspace.openTextDocument(testsRoot + `/comma/sample.cpp`);
 		let editor = await vscode.window.showTextDocument(document);
 		editor.selections = [
