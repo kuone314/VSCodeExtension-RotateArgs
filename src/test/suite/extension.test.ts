@@ -28,7 +28,7 @@ async function checkText(
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 suite('Extension Test Suite', () => {
 	test('test', async () => {
-		const document = await vscode.workspace.openTextDocument(testsRoot + `/sample.cpp`);
+		const document = await vscode.workspace.openTextDocument(testsRoot + `/comma/sample.cpp`);
 		let editor = await vscode.window.showTextDocument(document);
 		editor.selections = [
 			new vscode.Selection(new vscode.Position(0, 4), new vscode.Position(0, 11)),
@@ -44,7 +44,7 @@ suite('Extension Test Suite', () => {
 		await editor.edit(editBuilder => {
 			replace(editBuilder, info);
 		});
-		await checkText("", document, testsRoot + `/result.cpp`);
+		await checkText("", document, testsRoot + `/comma/result.cpp`);
 	});
 
 
