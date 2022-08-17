@@ -47,5 +47,33 @@ suite('Extension Test Suite', () => {
 		await checkText("", document, testsRoot + `/comma/result.cpp`);
 	});
 
+	test('rotate by equal', async () => {
+		const document = await vscode.workspace.openTextDocument(testsRoot + `/equal/sample.cpp`);
+		let editor = await vscode.window.showTextDocument(document);
+		editor.selections = [
+			new vscode.Selection(new vscode.Position(0,5),new vscode.Position(0,15)),
+			new vscode.Selection(new vscode.Position(1,0),new vscode.Position(1,10)),
+			];
+		const info = await replaceInfo(editor, new RegExp("\\s*=\\s*"));
+		await editor.edit(editBuilder => {
+			replace(editBuilder, info);
+		});
+		await checkText("", document, testsRoot + `/equal/result.cpp`);
+	});
+
+	test('rotate by space', async () => {
+		const document = await vscode.workspace.openTextDocument(testsRoot + `/space/sample.cpp`);
+		let editor = await vscode.window.showTextDocument(document);
+		editor.selections = [
+			new vscode.Selection(new vscode.Position(1,4),new vscode.Position(1,15)),
+			new vscode.Selection(new vscode.Position(0,4),new vscode.Position(0,11)),
+			new vscode.Selection(new vscode.Position(2,8),new vscode.Position(2,15)),
+			];
+		const info = await replaceInfo(editor, new RegExp("\\s+"));
+		await editor.edit(editBuilder => {
+			replace(editBuilder, info);
+		});
+		await checkText("", document, testsRoot + `/space/result.cpp`);
+	});
 
 });
