@@ -1,5 +1,41 @@
 import * as vscode from 'vscode';
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+export function activate(context: vscode.ExtensionContext) {
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('rotate-args.byComma', async () => {
+			const editor = vscode.window.activeTextEditor;
+			if (!editor) { return; }
+
+			const separator = new RegExp("\\s*,\\s*");
+			exec(editor, separator);
+		})
+	);
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('rotate-args.byEqual', async () => {
+			const editor = vscode.window.activeTextEditor;
+			if (!editor) { return; }
+
+			const separator = new RegExp("\\s*=\\s*");
+			exec(editor, separator);
+		})
+	);
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('rotate-args.bySpace', async () => {
+			const editor = vscode.window.activeTextEditor;
+			if (!editor) { return; }
+
+			const separator = new RegExp("\\s+");
+			exec(editor, separator);
+		})
+	);
+
+}
+
+export function deactivate() {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 function offset(document: vscode.TextDocument, pos: vscode.Position, val: number): vscode.Position {
@@ -116,30 +152,13 @@ export function replace(editBuilder: vscode.TextEditorEdit, replaceInfo: Array<[
 	}
 }
 
-async function exec(editor: vscode.TextEditor) {
-	const separator = new RegExp("\\s*,\\s*");
-
+async function exec(editor: vscode.TextEditor,separator:RegExp) {
 	const info = await replaceInfo(editor, separator);
 
 	editor.edit(editBuilder => {
 		replace(editBuilder, info);
 	});
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-export function activate(context: vscode.ExtensionContext) {
-
-	let disposable = vscode.commands.registerCommand('rotate-args.byComma', async () => {
-		const editor = vscode.window.activeTextEditor;
-		if (!editor) { return; }
-
-		exec(editor);
-	});
-
-	context.subscriptions.push(disposable);
-}
-
-export function deactivate() {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 async function isBracketSelect(editor: vscode.TextEditor, selection: vscode.Selection): Promise<Boolean>{
